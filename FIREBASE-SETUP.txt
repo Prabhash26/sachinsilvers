@@ -1,0 +1,65 @@
+SETUP: make products show on every phone and computer (free, about 10 minutes)
+=========================================================================
+
+You only do this ONCE. After that, when you add a product in the Admin Panel,
+it appears on the website for everyone, straight away. Nothing to download.
+
+STEP 1 - Create the project
+  1. Open https://console.firebase.google.com and sign in with a Google account.
+  2. Click "Create a project" (or "Add project"). Name it: sachinsilvers
+  3. Turn OFF Google Analytics (not needed) and click Create project.
+
+STEP 2 - Create the database
+  1. In the left menu click: Build > Firestore Database > Create database.
+  2. Location: choose  asia-south1 (Mumbai)  (or any nearby one). Click Next.
+  3. Choose "Start in production mode" and click Create.
+
+STEP 3 - Create your admin login
+  1. Left menu: Build > Authentication > Get started.
+  2. Under "Sign-in method" choose Email/Password, switch Enable ON, Save.
+  3. Open the "Users" tab > Add user. Type YOUR email (use small letters only)
+     and a strong password. This email + password is how you log in as admin
+     on the website. Remember both.
+
+STEP 4 - Connect the website
+  1. Click the gear icon (top left) > Project settings.
+  2. Scroll to "Your apps" and click the web icon  </>
+  3. Give it a name (sachinsilvers) and click Register app.
+  4. You will see a block of text called firebaseConfig. Copy the values for
+     apiKey, authDomain, projectId and appId.
+  5. Open the file  firebase-config.js  in your website folder and paste each
+     value between the quotes. Save the file.
+
+STEP 5 - Protect the database (very important)
+  1. Go back to Firestore Database > open the "Rules" tab.
+  2. Delete everything there and paste this. Change YOUR_ADMIN_EMAIL to the
+     same email you made in Step 3 (small letters), then click Publish:
+
+     rules_version = '2';
+     service cloud.firestore {
+       match /databases/{database}/documents {
+         match /products/{id} {
+           allow read: if true;
+           allow write: if request.auth != null
+                        && request.auth.token.email == "YOUR_ADMIN_EMAIL";
+         }
+       }
+     }
+
+     This means: everybody can SEE products, but only you can add or delete.
+
+STEP 6 - Use it
+  1. Refresh the website. Click "Admin Login", type your email and password.
+  2. Add products in the Admin Panel (Gallery page). They show up on the site
+     for everyone right away, on phones too.
+
+NOTES
+  - The website must be opened from Live Server or a web host (like GitHub Pages),
+    not by double-clicking index.html.
+  - Each product can hold about 5-6 photos. Photos are made smaller
+    automatically to fit the free database.
+  - Free plan limits are large (1 GB stored, 50,000 views per day). Check the
+    Firebase pricing page if you grow a lot.
+  - The "apiKey" in firebase-config.js is NOT a secret. The rules in Step 5 are
+    what keep the database safe.
+  - If you change your admin email later, change it in the Rules too.
